@@ -1,0 +1,80 @@
+# A protoAgent plugin BUNDLE (ADR 0040) — the Analyst archetype: answers the operator's
+# questions from their own local data files (CSV, TSV, Parquet, JSON, Excel, SQLite) with
+# read-only SQL on an embedded DuckDB, and shows each answer as one live chart plus a
+# one-line takeaway. This is the dedicated bundle repo protoAgent's archetype-catalog.json
+# `analyst` row installs (HELD from the picker until the operator lists it); the persona
+# ships as protoAgent's `analyst` soul preset.
+#
+# Install (onto any host):  python -m server plugin install <this-repo-url>
+# — or create a fleet member from it (README "Create an agent").
+#
+# READ-ONLY, AND ONLY WHAT YOU ALLOW. The data plugin opens files only inside the folders
+# in `data.data_dirs`, never writes to them, and makes no network calls. `data_dirs` is
+# operator-only (`spawns: true`): the agent's set_config refuses it, and the persona is told
+# never to try.
+#
+# CORE FLOOR — protoAgent >= 0.192.0 (bundles carry no min-version, so it is stated here
+# and in the README, not enforced by the bundle):
+#   * data-plugin declares `min_protoagent_version: 0.192.0` (the `vega-lite` artifact kind
+#     and the `artifact.show` plugin service data_chart renders through, protoAgent #4025),
+#     and the loader REFUSES it on an older core, so the agent would have no data tools;
+#   * the `analyst` soul preset ships with the protoAgent PR that added this archetype's
+#     catalog row. On a core without it, a picker/`soul_preset` create falls back to the
+#     base persona. Pass the persona inline as `soul` instead (README).
+#
+# FIRST-RUN SETUP — one optional answer (core >= 0.144.0 renders `config_inputs:`): the
+# folder that holds the operator's data. It becomes `data.data_dirs`. Left blank, the agent
+# tells the operator where to set it (Settings ▸ Plugins ▸ Data Analyst ▸ Data folders) on
+# the first question.
+#
+# MODEL — deliberately unset: the agent uses the host's model connection.
+#
+# PIN LIFECYCLE (ADR 0049): external members are pinned to release TAGS; on core >= 0.146
+# a pin is a FLOOR (installs take the newest COMPATIBLE tag, caret semantics, so for 0.x
+# the minor is the boundary). Bump only to adopt an out-of-range release. The verify
+# workflow proves each pin set. Keep member entries on ONE line:
+# scripts/check_bundle_updates.py rewrites `ref:` in place.
+
+id: analyst-archetype
+name: Analyst
+description: >-
+  An analyst that answers questions from your own data files. Point it at a folder of CSV,
+  TSV, Parquet, JSON, Excel or SQLite files and ask a question: it reads the schema, writes
+  read-only SQL against an embedded DuckDB, and answers with one live chart and a one-line
+  takeaway. It says what it assumed (date range, metric definition), cites the file the
+  numbers came from, never invents a number, and keeps answers short. It reads only the
+  folders you allow and never writes to them.
+
+# The core version this pin set was last verified against (ADR 0049): metadata, not
+# enforced. See CORE FLOOR above.
+verified_against: 0.192.0
+
+plugins:
+  - { id: data,     url: https://github.com/protoLabsAI/data-plugin, ref: v0.1.0 }  # Data Analyst: data_connect/sources/schema/profile/query/chart/export + the exploring-a-dataset and building-a-chart skills
+  - { id: artifact, builtin: true }                                                      # renders data_chart's live Vega-Lite charts
+  - { id: notes,    builtin: true }                                                      # on by default: definitions and findings between sessions
+
+enabled: [data, artifact, notes]   # suggested turn-on list
+
+# Create-time setup prompts (#2934, core >= 0.144.0). `help` renders on core >= 0.183.0.
+config_inputs:
+  - key: data.data_dirs
+    label: "Data folder"
+    help: "The folder that holds your data files. The agent can read files inside it and never writes to them. Add more later in Settings ▸ Plugins ▸ Data Analyst ▸ Data folders."
+    type: path
+
+# No `config:` defaults on purpose. The data plugin's own defaults (row caps, a 20 s query
+# timeout, a 1 GB memory limit) are right for a fresh agent, and `data_dirs` is the
+# operator's answer above, never a bundle default.
+
+# Agent archetype (ADR 0042 / 0100): presents this bundle as the "Analyst" agent type in
+# the new-agent picker once installed. `soul_preset` gives a DIRECT `plugin install <url>`
+# the persona on a host whose core ships the preset.
+archetype:
+  label: Analyst
+  icon: ChartColumn
+  soul_preset: analyst
+  blurb: Answers questions from your own data files — CSV, Parquet, Excel, SQLite — with SQL and a live chart. Read-only, and only the folders you allow.
+  # Capability contract (#2277, ADR 0100): the persona commits to querying and charting.
+  # Each tool is registered by the data member; verify_bundle.py fails if one isn't.
+  requires_tools: [data_query, data_chart]
