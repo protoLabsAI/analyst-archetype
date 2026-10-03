@@ -34,9 +34,6 @@
 # the minor is the boundary). Bump only to adopt an out-of-range release. The verify
 # workflow proves each pin set. Keep member entries on ONE line:
 # scripts/check_bundle_updates.py rewrites `ref:` in place.
-#
-# PRE-RELEASE PIN: `data` is pinned to the data-plugin v0.1.0 PR BRANCH (feat/v0.1.0) for
-# testing. Change it to `ref: v0.1.0` once that tag exists, before this bundle is tagged.
 
 id: analyst-archetype
 name: Analyst
@@ -53,7 +50,7 @@ description: >-
 verified_against: 0.192.0
 
 plugins:
-  - { id: data,     url: https://github.com/protoLabsAI/data-plugin, ref: feat/v0.1.0 }  # Data Analyst: data_connect/sources/schema/profile/query/chart/export + the exploring-a-dataset and building-a-chart skills
+  - { id: data,     url: https://github.com/protoLabsAI/data-plugin, ref: v0.1.0 }  # Data Analyst: data_connect/sources/schema/profile/query/chart/export + the exploring-a-dataset and building-a-chart skills
   - { id: artifact, builtin: true }                                                      # renders data_chart's live Vega-Lite charts
   - { id: notes,    builtin: true }                                                      # on by default: definitions and findings between sessions
 
