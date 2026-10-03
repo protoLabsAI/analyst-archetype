@@ -10,10 +10,13 @@ files, makes no network calls, and can't widen its own folder list.
 
 ## What an answer looks like
 
-> **Saturdays bring in the most: $4,210 a day on average, 31% above the weekday mean.**
-> *(a live bar chart of revenue by weekday, in the Artifact panel)*
-> Assumed: Jul 1 – Sep 30 2026, revenue = sum of `revenue`.
-> Source: `coffee_daily_sales.csv`
+> **Saturday sells the most: $2,351 in average daily revenue, 38.6% above the overall daily average.**
+> *(a live bar chart of average revenue by weekday, in the Artifact panel)*
+> Assumed: Jul 1 – Sep 30 2026 (92 days). "Sells the most" means average revenue per day;
+> each weekday appears 13 times (Wednesday 14), so averages are the fair comparison.
+> Source: `analyst-data/coffee_daily_sales.csv`
+
+(A real answer from a synthetic coffee-shop dataset, on `claude-sonnet-5-5`.)
 
 The default path for every question: **question → schema → query → one chart + a one-line
 takeaway.**
@@ -22,8 +25,9 @@ takeaway.**
 
 These are written into the persona (protoAgent's `config/soul-presets/analyst.md`):
 
-1. **It never invents a number.** Every figure comes from a query it ran. If the data can't
-   answer the question, it says so and says what's missing.
+1. **It never invents a number.** Every figure comes from a query it ran, derived ones
+   (percentages, ratios) included. If the data can't answer the question, it says so and
+   says what's missing.
 2. **It cites the source file** (and the table or sheet) for every answer.
 3. **It says what it assumed**: the date range, how it defined the metric, which rows it
    dropped and why.
