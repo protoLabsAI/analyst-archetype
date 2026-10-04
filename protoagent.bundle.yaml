@@ -8,10 +8,11 @@
 # Install (onto any host):  python -m server plugin install <this-repo-url>
 # — or create a fleet member from it (README "Create an agent").
 #
-# READ-ONLY, AND ONLY WHAT YOU ALLOW. The data plugin opens files only inside the folders
-# in `data.data_dirs`, never writes to them, and makes no network calls. `data_dirs` is
-# operator-only (`spawns: true`): the agent's set_config refuses it, and the persona is told
-# never to try.
+# READ-ONLY, AND ONLY WHAT YOU ALLOW. The data plugin opens files only inside the agent's own
+# data folder (`<workspace>/data`, created on load — data-plugin >= 0.1.4) and the folders in
+# `data.data_dirs`, never writes to them, and makes no network calls. `data_dirs` and
+# `use_default_folder` are operator-only (`spawns: true`): the agent's set_config refuses them,
+# and the persona is told never to try.
 #
 # CORE FLOOR — protoAgent >= 0.192.0 (bundles carry no min-version, so it is stated here
 # and in the README, not enforced by the bundle):
@@ -22,10 +23,11 @@
 #     catalog row. On a core without it, a picker/`soul_preset` create falls back to the
 #     base persona. Pass the persona inline as `soul` instead (README).
 #
-# FIRST-RUN SETUP — one optional answer (core >= 0.144.0 renders `config_inputs:`): the
-# folder that holds the operator's data. It becomes `data.data_dirs`. Left blank, the agent
-# tells the operator where to set it (Settings ▸ Plugins ▸ Data Analyst ▸ Data folders) on
-# the first question.
+# FIRST-RUN SETUP — one optional answer (core >= 0.144.0 renders `config_inputs:`): a folder
+# that already holds the operator's data. It becomes `data.data_dirs`. Left blank, the agent
+# still has its own data folder; on the first question it names that folder's path (from
+# data_sources) and says to drop files there or add folders in Settings ▸ Plugins ▸ Data
+# Analyst ▸ Data folders.
 #
 # MODEL — deliberately unset: the agent uses the host's model connection.
 #
@@ -43,7 +45,7 @@ description: >-
   read-only SQL against an embedded DuckDB, and answers with one live chart and a one-line
   takeaway. It says what it assumed (date range, metric definition), cites the file the
   numbers came from, never invents a number, and keeps answers short. It reads only the
-  folders you allow and never writes to them.
+  folders you allow (its own data folder, plus any you add) and never writes to them.
 
 # The core version this pin set was last verified against (ADR 0049): metadata, not
 # enforced. See CORE FLOOR above.
@@ -60,7 +62,7 @@ enabled: [data, artifact, notes]   # suggested turn-on list
 config_inputs:
   - key: data.data_dirs
     label: "Data folder"
-    help: "The folder that holds your data files. The agent can read files inside it and never writes to them. Add more later in Settings ▸ Plugins ▸ Data Analyst ▸ Data folders."
+    help: "Optional — the agent already has its own data folder (drop files there; it tells you the path). Pick a folder here only to read data where it already lives. The agent reads files inside it and never writes to them. Add more later in Settings ▸ Plugins ▸ Data Analyst ▸ Data folders."
     type: path
 
 # No `config:` defaults on purpose. The data plugin's own defaults (row caps, a 20 s query

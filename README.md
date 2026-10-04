@@ -58,8 +58,8 @@ stated here.
 ### From the picker (once the archetype is listed)
 
 The `analyst` row is in protoAgent's archetype catalog but **held**, so the picker doesn't
-serve it yet. Once it's listed: **Fleet ▸ New agent ▸ Analyst**, pick your **Data folder**
-on the set-up step, then **Create**.
+serve it yet. Once it's listed: **Fleet ▸ New agent ▸ Analyst**, optionally pick a **Data folder**
+on the set-up step (the agent has its own folder either way), then **Create**.
 
 Until then, there's a console route on any ≥ 0.192.0 hub: **Settings ▸ Plugins ▸ Install
 from URL** → `https://github.com/protoLabsAI/analyst-archetype`. An installed bundle with an
@@ -99,15 +99,23 @@ Then enable the suggested list (`data, artifact, notes`) and set the data folder
 
 ## First run
 
-The set-up step asks for one thing: the **Data folder** that holds your files. It's
-optional. If you skip it, the agent's first answer tells you where to set it:
+Every Analyst has **its own data folder**, `<agent workspace>/data` (data-plugin ≥ 0.1.4).
+It's created when the plugin loads and is always readable. On the desktop app it's
+`~/Library/Application Support/studio.protolabs.protoagent/workspaces/<id>/workspace/data`.
+Drop CSV, Excel, Parquet, JSON or SQLite files into it and ask. You don't need to configure
+anything.
+
+So the set-up step's **Data folder** field is **optional**. Fill it in only to read data
+where it already lives. If nothing is there yet, the agent's first answer tells you to drop
+files into your data folder (it shows the path, from `data_sources`) or add folders in:
 
 > **Settings ▸ Plugins ▸ Data Analyst ▸ Data folders**
 
 The value is one or more absolute folders (comma- or newline-separated). It's
 **operator-only**: the agent's `set_config` refuses it, and the persona never asks to change
-it. Credential files, your home directory as a whole and the agent's own home are refused
-even when listed.
+it. So is **Use the default data folder**, which turns the built-in folder off. Credential
+files, your home directory as a whole and the rest of the agent's own home are refused even
+when listed. The default folder is the one exception inside the agent home.
 
 Excel workbooks need `openpyxl` on the host; the agent says how to install it when it meets
 one. Then ask a question: *"Which weekday sells the most?"*
