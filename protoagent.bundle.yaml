@@ -39,6 +39,11 @@
 
 id: analyst-archetype
 name: Analyst
+# Release version — the source of truth for the vX.Y.Z tag. Read by release-tools'
+# plugin-release.yml (.github/workflows/release.yml); protoAgent's bundle loader ignores it.
+# Bump it in the PR that ships the release, then merge as `chore: release vX.Y.Z` (or
+# run the Release workflow by hand).
+version: 0.1.1
 description: >-
   An analyst that answers questions from your own data files. Point it at a folder of CSV,
   TSV, Parquet, JSON, Excel or SQLite files and ask a question: it reads the schema, writes
